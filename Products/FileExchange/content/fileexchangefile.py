@@ -13,7 +13,6 @@ class FileExchangeFile(ATFile):
     """A file"""
 
     implements(IFileExchangeFile)
-    __implements__ = ATFile.__implements__
 
     schema = FileExchangeFile_Schema
     portal_type = meta_type = 'FileExchange File'

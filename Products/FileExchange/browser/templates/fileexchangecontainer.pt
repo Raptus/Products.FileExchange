@@ -19,7 +19,8 @@
 
     <div class="fileexchange"
          tal:define="errors view/errors;
-                     errors_edit view/errors_edit">
+                     errors_edit view/errors_edit;
+                     tabindex context/@@plone/uniqueItemIndex;">
 
       <!-- Author information -->
       <h1 class="documentFirstHeading" >

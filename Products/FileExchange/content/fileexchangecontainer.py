@@ -25,7 +25,6 @@ for field in FileExchangeContainer_schema.keys():
 class FileExchangeContainer(OrderedBaseFolder, ATCTFolder):
     """A container for file attachments used for the fileexchange"""
     implements(IFileExchangeContainer, INonStructuralFolder)
-    __implements__ = (ATCTFolder.__implements__)
 
     portal_type = meta_type = "FileExchange Container"
     _at_rename_after_creation = True
