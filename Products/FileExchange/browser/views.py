@@ -3,8 +3,13 @@ configured in profiles/default/types/*.xml, this is being set as the default
 view of that content type.
 """
 
+import re
+from zope.component import getUtility
+
 from Acquisition import aq_inner, aq_parent
 from AccessControl import Unauthorized
+
+from zExceptions import BadRequest
 
 from DateTime import DateTime
 
@@ -13,10 +18,15 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from Products.CMFCore.utils import getToolByName
 
+from OFS.ObjectManager import checkValidId
+
 from plone.memoize.instance import memoize
+from plone.i18n.normalizer.interfaces import IIDNormalizer
 
 from Products.CMFPlone import PloneMessageFactory as _
 from Products.FileExchange.config import ADD_PERMISSIONS, MODIFY_PERMISSION
+
+
 
 class FileExchangeContainerView(BrowserView):
     """Default view of a fileexchange container
@@ -124,8 +134,11 @@ class FileExchangeContainerView(BrowserView):
         errors = self.errors
         if form.get('id', None) is not None:
             errors = self.errors_edit
-        if form.get('title', '') == '' and form.get('title_edit', '') == '':
+
+        # checks if the title are empty or has only whitespaces
+        if re.match('^[\s]*$', form.get('title', '')) and re.match('^[\s]*$',form.get('title_edit', '')):
             errors['title'] = _(u'This field is required, please provide some information.')
+
         if form.get('file', '').filename == '' and form.get('id', None) is None:
             errors['file'] = _(u'This field is required, please provide some information.')
         return (len(errors) == 0)
@@ -185,10 +198,7 @@ class FileExchangeContainerView(BrowserView):
             typestool = getToolByName(context, 'portal_types')
 
             f = form.get('file')
-            now = DateTime()
-            time = '%s.%s' % (now.strftime('%Y-%m-%d'), str(now.millis())[7:])
-            ext = f.filename.rfind('.') > -1 and f.filename[f.filename.rfind('.'):] or ''
-            id = 'file%s%s' % (time, ext)
+            id = self._create_id(context, f.filename)
 
             typestool.constructContent(type_name='FileExchange File', container=context, id=id)
             file = context.get(id, None)
@@ -198,3 +208,25 @@ class FileExchangeContainerView(BrowserView):
             self.putils.addPortalMessage(_(u'File successfully uploaded.'))
         except:
             self.putils.addPortalMessage(_(u'Fileupload failed.'))
+
+    def _create_id(self, container, filename):
+            id = startid = getUtility(IIDNormalizer).normalize(filename)
+            ok = False
+            counter = 0
+            while not ok:
+                try:
+                    checkValidId(container, id)
+                    ok = True
+                except BadRequest:
+                    counter += 1
+                    ext = startid.rfind('.') > -1 and startid[startid.rfind('.'):] or ''
+                    name = startid[:len(ext)*-1]
+                    id = '%s-%s%s' % (name,counter,ext)
+            return id
+
+
+
+
+
+
+
