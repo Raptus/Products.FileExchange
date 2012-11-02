@@ -6,7 +6,7 @@ version = '2.0b2'
 setup(name='Products.FileExchange',
       version=version,
       description="Provides a userfriendly view to exchange files between users",
-      long_description=open("README.txt").read() + "\n" +
+      long_description=open("README.rst").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
@@ -16,7 +16,7 @@ setup(name='Products.FileExchange',
       keywords='Plone File Exchange Upload',
       author='Raptus AG',
       author_email='dev@raptus.com',
-      url='https://svn.plone.org/svn/collective/Products.FileExchange',
+      url='https://github.com/Raptus/Products.FileExchange',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['Products'],
